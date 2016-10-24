@@ -1,4 +1,5 @@
 <?php
+  // method which pulls tweets which have location from ElasticSearch
 	function getTweetsWithLocation($keyword){
 		$ci = curl_init();
 		curl_setopt($ci, CURLOPT_URL, "https://search-tweet-db-jar6kiubxgklicyhdocs6p37he.us-east-1.es.amazonaws.com/".$keyword."/_search?size=10000");
@@ -8,13 +9,11 @@
   		$json_output = json_decode($get_output,true);
   		curl_close($ci);
   		$tweets = $json_output['hits']['hits'];
-  		// var_dump($tweets);
   		$num_tweets =  sizeof($tweets);
   		$geoArray = array();
   		for ($i=0; $i < $num_tweets; $i++) {
     		$geoArray[$i]["lat"] = $tweets[$i]['_source']['latitude']; 
     		$geoArray[$i]["long"] = $tweets[$i]['_source']['longtitude'];
-    		// echo "lat".$tweets[$i]['_source']['latitude']." lang".$tweets[$i]['_source']['longtitude']."<br>";
   		}
   		return $geoArray;
 	}

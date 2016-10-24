@@ -1,4 +1,5 @@
 <?php
+// Code to extract tweets which calls the getTweetsWithLocation.php file
 require 'getTweetsWithLocation.php';
 $valid_keywords = ["love","work","food","travel","trump","dog"];
 if(isset($_GET["keyword"])){
@@ -9,6 +10,5 @@ if(isset($_GET["keyword"])){
         $arrayForJS = json_encode($geoArray); 
     }
 }
-// echo sizeof($geoArray);
-echo $arrayForJS;
+echo json_encode($arrayForJS);
 ?>

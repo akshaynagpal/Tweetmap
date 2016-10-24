@@ -1,6 +1,6 @@
 <?php
 require 'getTweetsWithLocation.php';
-$valid_keywords = ["love","work","food","travel","trump","dog"];
+$valid_keywords = ["love","work","food","travel","trump","dog"];  //set of valid keywords
 $arrayForJS = null;
 $valid_keyword = false;
 ?>
@@ -18,7 +18,7 @@ $valid_keyword = false;
 <!DOCTYPE html>
 <html>
 <head>
-	  <title>Tweetmap</title>
+	  <title>Tweetmap </title>
 	  <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
@@ -30,9 +30,9 @@ $valid_keyword = false;
       #map {
         height: 100%;
       }
-      /*#data{
+      #data{
         display: none;
-      }*/
+      }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script type="text/javascript">
@@ -55,22 +55,33 @@ $valid_keyword = false;
             var map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 0, lng: 0},
               zoom:2,
-              draggable: true
+              draggable: true,
+              mapTypeId: 'satellite'
             });
 
             for(var i=0;i<geoArrayLength;i++){
-              marker = new google.maps.Marker({
-              position: new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]),
-              map: map
-              });
+              // marker = new google.maps.Marker({
+              // position: new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]),
+              // map: map
+              // });
+              locations.push(new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]));
             }
+            var heatmap = new google.maps.visualization.HeatmapLayer({
+                data: locations
+            });
+            heatmap.setMap(map);
+
           }
     </script>
     <script type="text/javascript">
 
+        // update map function to plot new marks based on new incoming tweets
+    
         function updateMap(){
-          geoArray =  JSON.parse(document.getElementById("data").innerHTML);
-          document.getElementById("numtweets").innerHTML = geoArray.length;
+
+          var jsonFetch = document.getElementById("data").innerHTML;
+          geoArray =  JSON.parse(jsonFetch);
+          //document.getElementById("numtweets").innerHTML = geoArray;
           window.initMap = function()  {
             var locations = [];
             var geoArrayLength = geoArray.length;
@@ -79,21 +90,30 @@ $valid_keyword = false;
             var map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 0, lng: 0},
               zoom:2,
-              draggable: true
+              draggable: true,
+              mapTypeId: 'satellite'
             });
 
             for(var i=0;i<geoArrayLength;i++){
-              marker = new google.maps.Marker({
-              position: new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]),
-              map: map
-              });
+              // marker = new google.maps.Marker({
+              // position: new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]),
+              // map: map
+              // });
+              locations.push(new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]));
             }
+
+            var heatmap = new google.maps.visualization.HeatmapLayer({
+                data: locations
+            });
+            heatmap.setMap(map);
+            console.log(geoArrayLength);
           }
         }
 
     </script>
 
     <script>
+    // updates tweets in real time every 60 seconds
         $(document).ready(function(){
             setInterval(function() {
                 $("#data").load('realtime.php?keyword='+'<?php echo $keyword ?>');
@@ -101,7 +121,7 @@ $valid_keyword = false;
                 addMap();
                 updateMap();
                 console.log("refreshed");
-            }, 7000);
+            }, 60000);
         });
     </script>
 
@@ -110,7 +130,7 @@ $valid_keyword = false;
 </head>
 <body>
 
-  <h1>Tweetmap</h1>
+  <h1>Tweetmap (Tweets refresh every 60 seconds)</h1>
   <div id="data"></div>
   <form id="homeform" action="index.php">
   	<select name="keyword" form="homeform">
