@@ -24,7 +24,7 @@ public class App
 
 	private static final int numberOfTweets = 50;
 
-	private static String[] searchTerms = new String[] {"love", "work", "food", "travel", "trump"};
+	private static String[] searchTerms = new String[] {"love", "work", "food", "travel", "trump", "dog"};
 
 	/* 
 	 * Get the Oauth2 token from Twitter
@@ -108,7 +108,7 @@ public class App
 			for (int queryNumber=0;; queryNumber++)
 			{
 
-				for(int ctr=0; ctr<5 ;ctr++){
+				for(int ctr=0; ctr<6 ;ctr++){
 					
 					System.out.println("Starting loop:"+ queryNumber);
 
