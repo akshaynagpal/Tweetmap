@@ -1,4 +1,5 @@
-# Tweetmap
+# Tweetmap 
+## Made by Akshay Nagpal (an2756) & Abhijeet Mehrotra (am4586)
 URL: http://tweetmap.xmvxdhrdpj.us-east-1.elasticbeanstalk.com/   
 ## Primary files in the project    
 1. Front end [Index.php](https://github.com/akshaynagpal/Tweetmap/blob/master/frontend%20and%20integration/index.php)   
