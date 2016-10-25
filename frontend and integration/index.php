@@ -42,7 +42,7 @@ $valid_keyword = false;
       }
       function addMap(){
         document.body.innerHTML += '<div id="map"></div>';
-        var temp = '<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBi4tEkxYklnWaWHMlLXMHKL8lDpk5TjqY&libraries=visualization&callback=initMap" async defer><\/script>';
+        var temp = '<script src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&libraries=visualization&callback=initMap" async defer><\/script>';
         $('head').append(temp);
       }
     </script>
