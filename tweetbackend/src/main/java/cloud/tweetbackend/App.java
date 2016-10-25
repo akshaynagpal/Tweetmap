@@ -19,8 +19,8 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class App 
 {
-	private static final String twitterKey = "VNLXiEY0l2XbFzSxJJz9AyGuA";
-	private static final String twitterSecret = "YXdAiSN2FhtM1BLxzfZTHvgGBAbCvIUsvE32i7TQpr85meLa12";
+	private static final String twitterKey = "XXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+	private static final String twitterSecret = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
 	private static final int numberOfTweets = 50;
 

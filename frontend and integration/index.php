@@ -60,10 +60,6 @@ $valid_keyword = false;
             });
 
             for(var i=0;i<geoArrayLength;i++){
-              // marker = new google.maps.Marker({
-              // position: new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]),
-              // map: map
-              // });
               locations.push(new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]));
             }
             var heatmap = new google.maps.visualization.HeatmapLayer({
@@ -81,7 +77,6 @@ $valid_keyword = false;
 
           var jsonFetch = document.getElementById("data").innerHTML;
           geoArray =  JSON.parse(jsonFetch);
-          //document.getElementById("numtweets").innerHTML = geoArray;
           window.initMap = function()  {
             var locations = [];
             var geoArrayLength = geoArray.length;
@@ -95,10 +90,6 @@ $valid_keyword = false;
             });
 
             for(var i=0;i<geoArrayLength;i++){
-              // marker = new google.maps.Marker({
-              // position: new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]),
-              // map: map
-              // });
               locations.push(new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]));
             }
 
@@ -113,7 +104,9 @@ $valid_keyword = false;
     </script>
 
     <script>
+
     // updates tweets in real time every 60 seconds
+
         $(document).ready(function(){
             setInterval(function() {
                 $("#data").load('realtime.php?keyword='+'<?php echo $keyword ?>');
@@ -125,13 +118,16 @@ $valid_keyword = false;
         });
     </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBi4tEkxYklnWaWHMlLXMHKL8lDpk5TjqY&libraries=visualization&callback=initMap"
+    <script src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&libraries=visualization&callback=initMap"
     async defer></script>
 </head>
 <body>
 
   <h1>Tweetmap (Tweets refresh every 60 seconds)</h1>
   <div id="data"></div>
+
+  <!-- dropdown menu -->
+  
   <form id="homeform" action="index.php">
   	<select name="keyword" form="homeform">
   		<option value="NULL">Select Keyword</option>
@@ -144,6 +140,9 @@ $valid_keyword = false;
   	</select>	
   	<input type="submit"> 
   </form>
+
+  <!-- end of Dropdown menu -->
+  
   <?php 
     if($valid_keyword){
       echo "keyword selected: ".$keyword;
