@@ -3,9 +3,7 @@ require 'getTweetsWithLocation.php';
 $valid_keywords = ["love","work","food","travel","trump","dog"];  //set of valid keywords
 $arrayForJS = null;
 $valid_keyword = false;
-?>
 
-<?php
     if(isset($_GET["keyword"])){
       $keyword = $_GET["keyword"];
       if(in_array($keyword, $valid_keywords)){
@@ -18,7 +16,7 @@ $valid_keyword = false;
 <!DOCTYPE html>
 <html>
 <head>
-	  <title>Tweetmap </title>
+	  <title>Tweet Map </title>
 	  <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <style>
@@ -34,73 +32,93 @@ $valid_keyword = false;
         display: none;
       }
     </style>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&libraries=visualization&callback=initMap" async defer
+    ></script>
     <script type="text/javascript">
-      function deleteMap(){
-        var element = document.getElementById("map");
-        element.parentNode.removeChild(element);
-      }
-      function addMap(){
-        document.body.innerHTML += '<div id="map"></div>';
-        var temp = '<script src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&libraries=visualization&callback=initMap" async defer><\/script>';
-        $('head').append(temp);
-      }
+
     </script>
     <script>
+        var heatmap,map;
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var markers = [], markerCluster;
         <?php  echo "var geoArray =  ".$arrayForJS.";\n";   ?>
         window.initMap = function() {
             var locations = [];
             var geoArrayLength = geoArray.length;
             var marker;
-            var map = new google.maps.Map(document.getElementById('map'), {
+            map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 0, lng: 0},
               zoom:2,
               draggable: true,
               mapTypeId: 'satellite'
             });
+            google.maps.event.addListener(map, 'click', function(e){
+              var location = e.latLng;
+              console.log("user clicked at (latitude,longitude) => ",location.lat(),location.lng());
+            });
 
             for(var i=0;i<geoArrayLength;i++){
               locations.push(new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]));
             }
-            var heatmap = new google.maps.visualization.HeatmapLayer({
-                data: locations
+            markers = locations.map(function(location, i) {
+                  return new google.maps.Marker({
+                    position: location,
+                    label: labels[i % labels.length]
+                  });
             });
-            heatmap.setMap(map);
+            markerCluster = new MarkerClusterer(map, markers,
+              {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+            }
 
-          }
-    </script>
-    <script type="text/javascript">
 
         // update map function to plot new marks based on new incoming tweets
-    
-        function updateMap(){
-
-          var jsonFetch = document.getElementById("data").innerHTML;
-          geoArray =  JSON.parse(jsonFetch);
-          window.initMap = function()  {
-            var locations = [];
-            var geoArrayLength = geoArray.length;
-            console.log(geoArrayLength);
-            var marker;
-            var map = new google.maps.Map(document.getElementById('map'), {
-              center: {lat: 0, lng: 0},
-              zoom:2,
-              draggable: true,
-              mapTypeId: 'satellite'
-            });
-
-            for(var i=0;i<geoArrayLength;i++){
-              locations.push(new google.maps.LatLng(geoArray[i]["lat"],geoArray[i]["long"]));
-            }
-
-            var heatmap = new google.maps.visualization.HeatmapLayer({
-                data: locations
-            });
-            heatmap.setMap(map);
-            console.log(geoArrayLength);
+        function setMapOnAll(map) {
+          for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
           }
         }
 
+        function clearMarkers() {
+          setMapOnAll(null);
+        }
+
+        function deleteMarkers() {
+          clearMarkers();
+          markers = [];
+        }
+
+        function updateMap(){
+          var geoArrayNew = "";
+          var geoArrayNewLength = 0;
+          var locations2 = [];
+          var req = new XMLHttpRequest(); //New request object
+          req.onload = function() {
+              geoArrayNew = JSON.parse(this.responseText); 
+          };
+          req.open("get","realtime.php?keyword="+'<?php echo $keyword ?>',false);
+          req.send(); 
+          geoArrayNewLength = geoArrayNew.length;
+          console.log("tweets indexed (max 10K) = "+geoArrayNewLength);
+          deleteMarkers();
+          //remove clusters
+          markerCluster.clearMarkers();
+          
+
+          for(var i=0;i<geoArrayNewLength;i++){
+              locations2.push(new google.maps.LatLng(geoArrayNew[i]["lat"],geoArrayNew[i]["long"]));
+          }
+          markers = locations2.map(function(location, i) {
+                  return new google.maps.Marker({
+                    position: location,
+                    label: labels[i % labels.length]
+                  });
+          });
+          markerCluster = new MarkerClusterer(map, markers,
+              {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+        }
     </script>
 
     <script>
@@ -110,21 +128,19 @@ $valid_keyword = false;
         $(document).ready(function(){
             setInterval(function() {
                 $("#data").load('realtime.php?keyword='+'<?php echo $keyword ?>');
-                deleteMap();
-                addMap();
+                
                 updateMap();
-                console.log("refreshed");
-            }, 60000);
+                // console.log("refreshed");
+            }, 10000);
         });
     </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&libraries=visualization&callback=initMap"
-    async defer></script>
+    
 </head>
 <body>
 
   <h1>Tweetmap (Tweets refresh every 60 seconds)</h1>
-  <div id="data"></div>
+  <div id="data" style="display: none;"></div>
 
   <!-- dropdown menu -->
   
@@ -152,7 +168,6 @@ $valid_keyword = false;
     }
   ?>
   <br>
-  <div id = "numtweets"></div>
   <div id="map"></div>
 </body>
 </html>
