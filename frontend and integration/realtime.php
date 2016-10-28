@@ -1,5 +1,5 @@
 <?php
-// Code to extract tweets which calls the getTweetsWithLocation.php file
+// Code to extract tweets in real-time which calls the getTweetsWithLocation.php file
 require 'getTweetsWithLocation.php';
 $valid_keywords = ["love","work","food","travel","trump","dog"];
 $arrayForJS = "";

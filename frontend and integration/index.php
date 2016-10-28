@@ -3,16 +3,17 @@ require 'getTweetsWithLocation.php';
 $valid_keywords = ["love","work","food","travel","trump","dog"];  //set of valid keywords
 $arrayForJS = null;
 $valid_keyword = false;
-
-    if(isset($_GET["keyword"])){
-      $keyword = $_GET["keyword"];
-      if(in_array($keyword, $valid_keywords)){
-        $valid_keyword = true;
-        $geoArray = getTweetsWithLocation($keyword);
-        $arrayForJS = json_encode($geoArray); 
-      }
+// validating and storing keyword from user
+  if(isset($_GET["keyword"])){
+    $keyword = $_GET["keyword"];
+    if(in_array($keyword, $valid_keywords)){
+      $valid_keyword = true;
+      $geoArray = getTweetsWithLocation($keyword);
+      $arrayForJS = json_encode($geoArray); 
     }
+  }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -35,16 +36,18 @@ $valid_keyword = false;
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&libraries=visualization&callback=initMap" async defer
+    <script src="https://maps.googleapis.com/maps/api/js?key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&libraries=visualization&callback=initMap" async defer
     ></script>
-    <script type="text/javascript">
 
-    </script>
     <script>
-        var heatmap,map;
+        var map;
+        var markers = []
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        var markers = [], markerCluster;
+        var markerCluster;
         <?php  echo "var geoArray =  ".$arrayForJS.";\n";   ?>
+
+        //initializing map
+
         window.initMap = function() {
             var locations = [];
             var geoArrayLength = geoArray.length;
@@ -74,7 +77,8 @@ $valid_keyword = false;
             }
 
 
-        // update map function to plot new marks based on new incoming tweets
+        // set and delete markers
+
         function setMapOnAll(map) {
           for (var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
@@ -90,6 +94,9 @@ $valid_keyword = false;
           markers = [];
         }
 
+
+        // update map function to plot new marks based on new incoming tweets
+
         function updateMap(){
           var geoArrayNew = "";
           var geoArrayNewLength = 0;
@@ -98,7 +105,7 @@ $valid_keyword = false;
           req.onload = function() {
               geoArrayNew = JSON.parse(this.responseText); 
           };
-          req.open("get","realtime.php?keyword="+'<?php echo $keyword ?>',false);
+          req.open("get","realtime.php?keyword="+"<?php echo $keyword ?>",false);
           req.send(); 
           geoArrayNewLength = geoArrayNew.length;
           console.log("tweets indexed (max 10K) = "+geoArrayNewLength);
@@ -119,11 +126,8 @@ $valid_keyword = false;
           markerCluster = new MarkerClusterer(map, markers,
               {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
         }
-    </script>
 
-    <script>
-
-    // updates tweets in real time every 60 seconds
+    // updates tweets in real time every 45 seconds
 
         $(document).ready(function(){
             setInterval(function() {
@@ -131,15 +135,13 @@ $valid_keyword = false;
                 
                 updateMap();
                 // console.log("refreshed");
-            }, 10000);
+            }, 45000);
         });
     </script>
-
-    
 </head>
 <body>
 
-  <h1>Tweetmap (Tweets refresh every 60 seconds)</h1>
+  <h1>Tweetmap (Tweets refresh in Real Time every 45 seconds)</h1>
   <div id="data" style="display: none;"></div>
 
   <!-- dropdown menu -->
@@ -168,6 +170,8 @@ $valid_keyword = false;
     }
   ?>
   <br>
+
+  <!-- container  for MAP-->
   <div id="map"></div>
 </body>
 </html>
